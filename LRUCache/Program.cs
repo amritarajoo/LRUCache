@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace LRUCache
 {
 
-    public class LRU
+    public class LRU<TKey,TValue>
     {
         public int capacity;
         private int noOfElements = 0;
-        public Dictionary<int, LinkedListNode<Data>> dict = new Dictionary<int, LinkedListNode<Data>>();
-        public LinkedList<Data> LRUList = new LinkedList<Data>();
+        public Dictionary<TKey, LinkedListNode<Data<TKey,TValue>>> dict = new Dictionary<TKey, LinkedListNode<Data<TKey,TValue>>>();
+        public LinkedList<Data<TKey,TValue>> LRUList = new LinkedList<Data<TKey,TValue>>();
         public int CurrNoOfElements
         {
             get
@@ -33,12 +33,12 @@ namespace LRUCache
             LRUList.Clear();
         }
 
-        public bool TryGetValue(int ky, out string oVal)
+        public bool TryGetValue(TKey ky, out TValue oVal)
         {
 
             if (dict.ContainsKey(ky))
             {
-                LinkedListNode<Data> dictVal = dict[ky];
+                LinkedListNode<Data<TKey,TValue>> dictVal = dict[ky];
                 // LinkedListNode<Data> lnode = LRUList.Find(dictVal.Value);
                 LRUList.Remove(dictVal);
                 LRUList.AddFirst(dictVal);
@@ -49,15 +49,15 @@ namespace LRUCache
 
 
             }
-            oVal = null;
+            oVal = default(TValue);
             return false;
         }
 
-        public void Add(int key, string str)
+        public void Add(TKey key, TValue str)
         {
 
-            Data d = new Data(key, str);
-            LinkedListNode<Data> val;
+            Data<TKey,TValue> d = new Data<TKey,TValue>(key, str);
+            LinkedListNode<Data<TKey,TValue>> val;
             if (dict.Count == 0 && LRUList.Count < capacity)
             {
 
@@ -73,7 +73,7 @@ namespace LRUCache
                 }
                 else if (LRUList.Count >= capacity)
                 {
-                    int keyToRemove = LRUList.Last.Value.index;
+                    TKey keyToRemove = LRUList.Last.Value.index;
                     dict.Remove(keyToRemove);
                     LRUList.RemoveLast();
 
@@ -90,11 +90,11 @@ namespace LRUCache
         }
     }
 
-    public class Data
+    public class Data<TKey,TValue>
     {
-        public int index;
-        public string val;
-        public Data(int i, string v)
+        public TKey index;
+        public TValue val;
+        public Data(TKey i, TValue v)
         {
             this.index = i;
             this.val = v;
@@ -139,7 +139,7 @@ namespace LRUCache
 
         public void Test()
         {
-            LRU lruCache = new LRU(3);
+            LRU<int,string> lruCache = new LRU<int,string>(3);
             Console.WriteLine("No.Of ElementsinCache: {0}        Capacity : {1}", lruCache.CurrNoOfElements, lruCache.capacity);
             for (int i = 0; i < 8; i++)
             {
